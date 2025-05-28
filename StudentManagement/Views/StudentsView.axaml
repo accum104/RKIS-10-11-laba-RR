@@ -1,0 +1,148 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:StudentManagement.ViewModels"
+             xmlns:converters="using:StudentManagement.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="StudentManagement.Views.StudentsView"
+             x:DataType="vm:StudentsViewModel">
+
+    <UserControl.Resources>
+        <converters:PhotoPathConverter x:Key="PhotoPathConverter"/>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Margin="10">
+            <TextBox Text="{Binding NewStudentName}" Watermark="Имя студента" Margin="0,0,0,10"/>
+            <TextBlock Text="Выберите курсы:" Margin="0,0,0,5"/>
+            <ListBox ItemsSource="{Binding AvailableCourses}"
+                     SelectedItems="{Binding SelectedCoursesForNewStudent}"
+                     SelectionMode="Multiple"
+                     Height="100"
+                     Margin="0,0,0,10"
+                     Background="White">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Name}" 
+                                  IsChecked="{Binding IsSelected}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Content="Добавить студента" 
+                    Command="{Binding AddStudentCommand}"
+                    IsEnabled="{Binding NewStudentName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+        </StackPanel>
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Students}" Margin="10">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="1" Margin="0,0,0,10" Padding="10">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Grid Grid.Column="0" Width="100" Height="100" Margin="0,0,10,0">
+                                    <Border Background="LightGray" CornerRadius="50">
+                                        <Panel>
+                                            <Image Source="{Binding PhotoPath, Converter={StaticResource PhotoPathConverter}}"
+                                                   Stretch="UniformToFill"
+                                                   Width="100"
+                                                   Height="100">
+                                                <Image.Clip>
+                                                    <EllipseGeometry RadiusX="50" 
+                                                                    RadiusY="50" 
+                                                                    Center="50,50"/>
+                                                </Image.Clip>
+                                            </Image>
+                                            <Panel IsVisible="{Binding PhotoPath, Converter={x:Static StringConverters.IsNullOrEmpty}}">
+                                                <TextBlock Text="Нет фото"
+                                                         HorizontalAlignment="Center"
+                                                         VerticalAlignment="Center"/>
+                                            </Panel>
+                                            <Button Command="{Binding ((vm:StudentsViewModel)DataContext).SelectPhotoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Classes="photo-button"
+                                                    Width="100"
+                                                    Height="100"
+                                                    CornerRadius="50">
+                                                <TextBlock Text="Фото"
+                                                         HorizontalAlignment="Center"
+                                                         VerticalAlignment="Center"/>
+                                                <Button.Styles>
+                                                    <Style Selector="Button.photo-button">
+                                                        <Setter Property="Background" Value="#80000000"/>
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                        <Setter Property="Opacity" Value="0"/>
+                                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                                    </Style>
+                                                    <Style Selector="Button.photo-button:pointerover">
+                                                        <Setter Property="Opacity" Value="1"/>
+                                                    </Style>
+                                                </Button.Styles>
+                                            </Button>
+                                        </Panel>
+                                    </Border>
+                                </Grid>
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <TextBox Text="{Binding Name}" 
+                                             IsReadOnly="{Binding !$parent[ItemsControl].((vm:StudentsViewModel)DataContext).IsEditing}"
+                                             FontWeight="Bold"/>
+                                    <TextBlock Text="Курсы студента:" Margin="0,5,0,5"/>
+                                    <ListBox ItemsSource="{Binding $parent[ItemsControl].((vm:StudentsViewModel)DataContext).AvailableCourses}"
+                                             SelectionMode="Multiple"
+                                             Height="100"
+                                             Background="White"
+                                             IsVisible="{Binding $parent[ItemsControl].((vm:StudentsViewModel)DataContext).IsEditing}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <CheckBox Content="{Binding Name}" 
+                                                          IsChecked="{Binding IsSelected}"/>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <ItemsControl ItemsSource="{Binding Courses}"
+                                                Background="White"
+                                                Margin="0,5"
+                                                IsVisible="{Binding !$parent[ItemsControl].((vm:StudentsViewModel)DataContext).IsEditing}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                                    <TextBlock Grid.Column="0" Text="{Binding Name}"/>
+                                                    <Button Grid.Column="1" 
+                                                            Content="✕"
+                                                            Command="{Binding ((vm:StudentsViewModel)DataContext).RemoveCourseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            Margin="5,0,0,0"
+                                                            Padding="5,0"
+                                                            Background="Transparent"
+                                                            Foreground="Red"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Orientation="Vertical" Spacing="5">
+                                    <Button Content="Изменить" 
+                                            Command="{Binding $parent[ItemsControl].((vm:StudentsViewModel)DataContext).StartEditingCommand}"
+                                            CommandParameter="{Binding}"
+                                            IsVisible="{Binding !$parent[ItemsControl].((vm:StudentsViewModel)DataContext).IsEditing}"/>
+                                    <Button Content="Сохранить" 
+                                            Command="{Binding $parent[ItemsControl].((vm:StudentsViewModel)DataContext).SaveChangesCommand}"
+                                            IsVisible="{Binding $parent[ItemsControl].((vm:StudentsViewModel)DataContext).IsEditing}"/>
+                                    <Button Content="Отмена" 
+                                            Command="{Binding $parent[ItemsControl].((vm:StudentsViewModel)DataContext).CancelEditingCommand}"
+                                            IsVisible="{Binding $parent[ItemsControl].((vm:StudentsViewModel)DataContext).IsEditing}"/>
+                                    <Button Content="Удалить"
+                                            Command="{Binding $parent[ItemsControl].((vm:StudentsViewModel)DataContext).DeleteStudentCommand}"
+                                            CommandParameter="{Binding}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl> 

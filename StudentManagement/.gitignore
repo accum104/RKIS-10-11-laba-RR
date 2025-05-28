@@ -1,0 +1,35 @@
+# .NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.lock.json
+*.nuget.props
+*.nuget.targets
+
+# Visual Studio files
+.vs/
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.sdf
+*.opensdf
+*.cachefile
+
+# SQLite database
+*.db
+*.db-shm
+*.db-wal
+
+# Images folder (except .gitkeep)
+Images/*
+!Images/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo 

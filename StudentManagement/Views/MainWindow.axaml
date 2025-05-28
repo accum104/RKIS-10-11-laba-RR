@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:StudentManagement.ViewModels"
+        xmlns:views="using:StudentManagement.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="StudentManagement.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Управление студентами">
+
+    <Window.Styles>
+        <Style Selector="Button.nav-button">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Background" Value="#2c3e50"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Styles>
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Left" 
+                    Background="#34495e" 
+                    Width="150">
+            <Button Command="{Binding NavigateToStudentsCommand}"
+                    Classes="nav-button"
+                    Content="Студенты"/>
+            <Button Command="{Binding NavigateToCoursesCommand}"
+                    Classes="nav-button"
+                    Content="Курсы"/>
+        </StackPanel>
+
+        <ContentControl Content="{Binding CurrentViewModel}"/>
+    </DockPanel>
+
+</Window>

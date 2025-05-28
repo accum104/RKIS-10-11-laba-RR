@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:StudentManagement.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="StudentManagement.Views.CoursesView"
+             x:DataType="vm:CoursesViewModel">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Margin="10">
+            <TextBox Text="{Binding NewCourseName}" 
+                     Watermark="Название курса" 
+                     Margin="0,0,0,10"/>
+            <TextBox Text="{Binding NewCourseDescription}" 
+                     Watermark="Описание курса" 
+                     Height="100" 
+                     TextWrapping="Wrap" 
+                     AcceptsReturn="True" 
+                     Margin="0,0,0,10"/>
+            <Button Content="Добавить курс" 
+                    Command="{Binding AddCourseCommand}"
+                    IsEnabled="{Binding NewCourseName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+        </StackPanel>
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Courses}" Margin="10">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="1" Margin="0,0,0,10" Padding="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" Spacing="5">
+                                    <TextBox Text="{Binding Name}" 
+                                             IsReadOnly="{Binding !$parent[ItemsControl].((vm:CoursesViewModel)DataContext).IsEditing}"
+                                             FontWeight="Bold"/>
+                                    <TextBox Text="{Binding Description}" 
+                                             IsReadOnly="{Binding !$parent[ItemsControl].((vm:CoursesViewModel)DataContext).IsEditing}"
+                                             Height="60" 
+                                             TextWrapping="Wrap" 
+                                             AcceptsReturn="True"/>
+                                    <StackPanel Margin="0,10,0,0">
+                                        <TextBlock Text="Студенты на курсе:" 
+                                                 FontWeight="Bold" 
+                                                 Margin="0,0,0,5"/>
+                                        <ItemsControl ItemsSource="{Binding Students}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Name}" 
+                                                             Margin="10,2"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="5">
+                                    <Button Content="Изменить" 
+                                            Command="{Binding $parent[ItemsControl].((vm:CoursesViewModel)DataContext).StartEditingCommand}"
+                                            CommandParameter="{Binding}"
+                                            IsVisible="{Binding !$parent[ItemsControl].((vm:CoursesViewModel)DataContext).IsEditing}"/>
+                                    <Button Content="Сохранить" 
+                                            Command="{Binding $parent[ItemsControl].((vm:CoursesViewModel)DataContext).SaveChangesCommand}"
+                                            IsVisible="{Binding $parent[ItemsControl].((vm:CoursesViewModel)DataContext).IsEditing}"/>
+                                    <Button Content="Отмена" 
+                                            Command="{Binding $parent[ItemsControl].((vm:CoursesViewModel)DataContext).CancelEditingCommand}"
+                                            IsVisible="{Binding $parent[ItemsControl].((vm:CoursesViewModel)DataContext).IsEditing}"/>
+                                    <Button Content="Удалить"
+                                            Command="{Binding $parent[ItemsControl].((vm:CoursesViewModel)DataContext).DeleteCourseCommand}"
+                                            CommandParameter="{Binding}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl> 
